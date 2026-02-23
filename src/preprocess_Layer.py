@@ -8,10 +8,11 @@ STOPWORDS = set(stopwords.words('english'))
 
 
 def clean_text(text):
-
     text = text.lower()
-    text = text.translate(str.maketrans('','', string.punction))
+   
+    text = text.translate(str.maketrans('', '', string.punctuation))
+
     words = text.split()
-    words = [word for word in words if word not in STOPWORDS]
-    cleaned_text = ''.join(words)
-    return cleaned_text
+    words = [w for w in words if w not in STOPWORDS]
+
+    return ' '.join(words)

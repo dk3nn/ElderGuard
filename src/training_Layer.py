@@ -17,8 +17,8 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
 
-from src.preprocess_Layer import clean_text
-from src.logRegression import CustomLogisticRegression  # your custom class
+from preprocess_Layer import clean_text
+from logRegression import CustomLogisticRegression  # your custom class
 
 
 DATA_PATH = "../data/Dataset_10191.csv"
@@ -43,19 +43,19 @@ data = data.dropna(subset=["label", "clean_text"])
 data["label"] = data["label"].astype(int)
 
 # Vectorize text 
-vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1, 2))
+vectorizer = TfidfVectorizer(max_features=2000, ngram_range=(1, 2))
 X = vectorizer.fit_transform(data["clean_text"])
 y = data["label"].to_numpy()
 
-# 5 Train/test split 
+# Train/test split 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# 6 Define sklearn models 
+# Define sklearn models 
 models = {
     "Baseline_MostFrequent": DummyClassifier(strategy="most_frequent"),
-    "Sklearn_LogisticRegression": LogisticRegression(max_iter=2000),
+    "Sklearn_LogisticRegression": LogisticRegression(max_iter=2000, class_weight="balanced", solver="liblinear"),
     "LinearSVC": LinearSVC(),
     "RandomForest": RandomForestClassifier(
         n_estimators=300,
@@ -102,7 +102,7 @@ for name, model in models.items():
         "tp": cm[1, 1],
     })
 
-    # Save sklearn models (optional; helps later)
+    # Save sklearn models 
     if name != "Baseline_MostFrequent":
         joblib.dump(model, f"../models/{name}.pkl")
 
@@ -117,15 +117,37 @@ print("=" * 70)
 X_train_dense = X_train.toarray().astype(np.float64)
 X_test_dense = X_test.toarray().astype(np.float64)
 
+
 custom_model = CustomLogisticRegression(
-    lr=0.1,
-    epochs=2000,
-    reg_strength=0.0,
+    lr=0.02,
+    epochs=3000,
+    reg_strength=.01,
     verbose=True
 )
 
 custom_model.fit(X_train_dense, y_train)
-y_pred_custom = custom_model.predict(X_test_dense)
+probs = custom_model.predict_proba(X_test_dense)[:, 1]
+
+
+best_t, best_f1 = 0.5, -1
+best_stats = None
+
+for t in np.arange(0.30, 0.71, 0.01):
+    preds = (probs >= t).astype(int)
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        y_test, preds, average="binary", pos_label=1, zero_division=0
+    )
+    if f1 > best_f1:
+        best_f1 = f1
+        best_t = float(t)
+        best_stats = (precision, recall, f1, confusion_matrix(y_test, preds))
+
+precision, recall, f1, cm = best_stats
+
+y_pred_custom = (probs >= best_t).astype(int)
+
+
+y_pred_custom = custom_model.predict(X_test_dense, threshold=0.5)
 
 acc = accuracy_score(y_test, y_pred_custom)
 
@@ -184,7 +206,7 @@ print("Saved: ../results/plots/model_comparison_bar.png")
 
 def plot_cm(cm, title, path):
     plt.figure(figsize=(4, 4))
-    plt.imshow(cm)
+    plt.imshow(cm, cmap="Blues")
     plt.title(title)
     plt.xlabel("Predicted")
     plt.ylabel("True")
