@@ -75,10 +75,23 @@ class CustomLogisticRegression:
 
     def predict_proba(self, X):
         X = np.asarray(X, dtype=np.float64)
-        z = X @ self.w + self.b
-        p1 = self._sigmoid(z)
+
+        # Guard: if params already went bad, fail loudly
+        if self.w is None or (not np.isfinite(self.w).all()) or (not np.isfinite(self.b)):
+            raise ValueError("Model parameters (w/b) are NaN/inf or not initialized.")
+
+        # Safe matmul (suppresses runtime warnings at the source)
+        with np.errstate(over="ignore", divide="ignore", invalid="ignore"):
+            z = X @ self.w + self.b
+
+        # Clean BEFORE sigmoid
+            z = np.nan_to_num(z, nan=0.0, posinf=500.0, neginf=-500.0)
+            z = np.clip(z, -500, 500)
+
+        p1 = self._sigmoid(z)  # your sigmoid already clips too (extra safety)
         return np.vstack([1 - p1, p1]).T
+
 
     def predict(self, X, threshold=0.5):
         p1 = self.predict_proba(X)[:, 1]
-        return (p1 >= threshold).astype(int)
+        return (p1 >= threshold).astype(int)    
