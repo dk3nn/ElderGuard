@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "ElderGuard",
+  "version": "1.0",
+
+  "permissions": [
+    "identity",
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+
+  "host_permissions": [
+    "https://www.googleapis.com/*",
+    "https://mail.google.com/*"
+  ],
+
+  "oauth2": {
+    "client_id": "247358983782-hh033qk4el8aedo900tbbm2t7b46qa6i.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.readonly"
+    ]
+  },
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "action": {
+    "default_popup": "index.html"
+  }
+}
