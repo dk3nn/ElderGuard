@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./UserChat.css";
+import { analyzeMessage } from "../services/api";
 
 const USER_AVATAR =
   "https://static.vecteezy.com/system/resources/previews/028/569/170/large_2x/single-man-icon-people-icon-user-profile-symbol-person-symbol-businessman-stock-vector.jpg";
@@ -12,28 +14,83 @@ export default function Chat() {
   const [input, setInput] = useState("");
   const [image, setImage] = useState(null);
 
-  // Bot welcome message
-  useEffect(() => {
+    useEffect(() => {
     const timer = setTimeout(() => {
-      setMessages([
-        { sender: "bot", text: "Hi! How can I help you today?" },
+      setMessages(prev => [
+        ...prev,
+        { sender: "bot", text: "Hello! I see you're looking for some detailed information. I can help with that." },
       ]);
     }, 800);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSend = () => {
-    if (!input && !image) return;
+/** 
+   useEffect(() => {
+    const timer = setTimeout(() => {
+      setMessages(prev => [
+        ...prev,
+        { sender: "bot", text: "Absolutely — let me pull together the details for you." },
+      ]);
+    }, 7000);
+
+    return () => clearTimeout(timer);
+  }, []);
+*/
+
+
+
+
+  
+ const handleSend = async () => {
+  if (!input && !image) return;
+
+  const userMessage = { sender: "user", text: input, image };
+
+  setMessages((prev) => [...prev, userMessage]);
+
+  const currentText = input;
+  setInput("give me your bank account details");
+  setImage(null);
+
+  // Add temporary loading message
+  setMessages((prev) => [
+    ...prev,
+    { sender: "bot", text: "Analyzing message..." }
+  ]);
+
+  try {
+    const data = await analyzeMessage(currentText);
+
+    // Expected backend response format example:
+    // {
+    //   prediction: "scam",
+    //   confidence: 0.92,
+    //   explanation: "This message contains urgency and payment request."
+    // }
+
+    const botReply = `
+Prediction: ${data.prediction.toUpperCase()}
+Confidence: ${(data.confidence * 100).toFixed(1)}%
+Reason: ${data.explanation}
+    `;
 
     setMessages((prev) => [
-      ...prev,
-      { sender: "user", text: input, image },
+      ...prev.slice(0, -1), // remove "Analyzing..."
+      { sender: "bot", text: botReply }
     ]);
 
-    setInput("");
-    setImage(null);
-  };
+  } catch (error) {
+    setMessages((prev) => [
+      ...prev.slice(0, -1),
+      { sender: "bot", text: "Error connecting to server." }
+    ]);
+  }
+};
+
+
+
+
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -44,6 +101,7 @@ export default function Chat() {
 
   return (
     <div className="chat-container">
+
       {/* HEADER */}
       <div className="chat-header">
         <img id="cs" src={BOT_AVATAR} alt="Support" />

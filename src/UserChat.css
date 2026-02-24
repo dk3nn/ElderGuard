@@ -6,18 +6,22 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;   /* horizontal center */
+  align-items: center;       /* vertical center */
   background: url("https://wallpapers.com/images/hd/cool-green-background-jjqmon0opz7n0b50.jpg")
     center / cover no-repeat;
 }
 
 .chat-container {
   max-width: 420px;
-  margin: 40px auto;
+
   display: flex;
   flex-direction: column;
   background: #ffffff;
   border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px whitesmoke;
   overflow: hidden;
   max-height: 90vh;
 }
