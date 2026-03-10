@@ -25,18 +25,7 @@ export default function Chat() {
     return () => clearTimeout(timer);
   }, []);
 
-/** 
-   useEffect(() => {
-    const timer = setTimeout(() => {
-      setMessages(prev => [
-        ...prev,
-        { sender: "bot", text: "Absolutely — let me pull together the details for you." },
-      ]);
-    }, 7000);
 
-    return () => clearTimeout(timer);
-  }, []);
-*/
 
 
 
@@ -50,10 +39,10 @@ export default function Chat() {
   setMessages((prev) => [...prev, userMessage]);
 
   const currentText = input;
-  setInput("give me your bank account details");
+  setInput("");
   setImage(null);
 
-  // Add temporary loading message
+  //  temporary loading message
   setMessages((prev) => [
     ...prev,
     { sender: "bot", text: "Analyzing message..." }
@@ -62,22 +51,35 @@ export default function Chat() {
   try {
     const data = await analyzeMessage(currentText);
 
-    // Expected backend response format example:
+    // backend response example:
     // {
     //   prediction: "scam",
     //   confidence: 0.92,
     //   explanation: "This message contains urgency and payment request."
+    //   simple_explanation: "The message tries to create a sense of urgency and asks for money, which are common signs of scams.",
+    //   scam_type: "Phishing",
+    //   safety_steps: [
     // }
 
-    const botReply = `
-Prediction: ${data.prediction.toUpperCase()}
+   const botReply = `
+ Scam Detection Result
+
+Status: ${data.prediction === "scam" ? " Scam Detected" : " Safe Message"}
 Confidence: ${(data.confidence * 100).toFixed(1)}%
-Reason: ${data.explanation}
-    `;
+
+ What This Means:
+${data.simple_explanation}
+
+ Scam Type:
+${data.scam_type}
+
+ Safety Steps:
+${data.safety_steps.map(step => `• ${step}`).join("\n")}
+`;
 
     setMessages((prev) => [
       ...prev.slice(0, -1), // remove "Analyzing..."
-      { sender: "bot", text: botReply }
+      { sender: "bot", result: data }
     ]);
 
   } catch (error) {
@@ -126,6 +128,35 @@ Reason: ${data.explanation}
                 <img src={msg.image} alt="uploaded" className="chat-image" />
               )}
               {msg.text && <p>{msg.text}</p>}
+
+{msg.result && (
+  <div className="analysis-result">
+    <h3>
+      {msg.result.prediction === "scam"
+        ? " Scam Detected"
+        : " Message Looks Safe"}
+    </h3>
+
+    <p><strong>Confidence:</strong> {(msg.result.confidence * 100).toFixed(1)}%</p>
+
+    <p><strong>What This Means:</strong><br />
+      {msg.result.simple_explanation}
+    </p>
+
+    <p><strong>Scam Type:</strong><br />
+      {msg.result.scam_type}
+    </p>
+
+    <div>
+      <strong>Safety Steps:</strong>
+      <ul>
+        {msg.result.safety_steps.map((step, i) => (
+          <li key={i}>{step}</li>
+        ))}
+      </ul>
+    </div>
+  </div>
+)}
             </div>
           </div>
         ))}
