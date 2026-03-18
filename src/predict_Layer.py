@@ -29,16 +29,16 @@ def predict(text: str) -> dict:
     # Vectorize 
     vec_sparse = vectorizer.transform([cleaned])
 
-    # 3) Convert to dense for your custom model
+    #Convert to dense for your custom model
     vec = vec_sparse.toarray().astype(np.float64)
 
-    # 4) Custom model probability that class=1 (Scam)
+    # Custom model probability that class=1 (Scam)
     ai_prob = float(model.predict_proba(vec)[0][1])
 
-    # 5) Rule-based score 
+    # Rule-based score 
     rule_prob, rule_reasons= rule_based_risk_score(text)
 
-    # 6) Combine scores
+    # Combine scores
     final_score = float((ai_prob * 0.7) + (rule_prob * 0.3))
 
     return {
@@ -51,5 +51,5 @@ def predict(text: str) -> dict:
 
 
 if __name__ == "__main__":
-    sample = "URGENT: verify your account now at http://fake-link.com"
+    sample = "Hi im ElderGuard"#"URGENT: verify your account now at http://fake-link.com"
     print(predict(sample))

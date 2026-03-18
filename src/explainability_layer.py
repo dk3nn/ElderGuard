@@ -4,7 +4,7 @@ import re
 def explain_prediction(text, vec, model, vectorizer, risk_score):
     explanation = {}
 
-    # ---------- Model-based ---------- #
+    # Model-based 
     if hasattr(model, "coef_"):
         feature_names = vectorizer.get_feature_names_out()
         vec_dense = vec.toarray()[0]
@@ -19,7 +19,7 @@ def explain_prediction(text, vec, model, vectorizer, risk_score):
     else:
         explanation["top_phrases"] = []
 
-    # ---------- Rule-based ---------- #
+    # Rule-based 
     flags = []
 
     if re.search(r"http[s]?://|www\.", text):
@@ -36,7 +36,7 @@ def explain_prediction(text, vec, model, vectorizer, risk_score):
 
     explanation["red_flags"] = flags
 
-    # ---------- Advice ----------
+    # Advice 
     if risk_score >= 0.7:
         advice = [
             "Do not click links or call numbers in this message.",

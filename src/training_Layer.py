@@ -18,7 +18,9 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
 
 from preprocess_Layer import clean_text
-from logRegression import CustomLogisticRegression  # your custom class
+from logRegression import CustomLogisticRegression
+from linearSVC import CustomLinearSVC
+from randomForest import CustomRandomForest
 
 
 DATA_PATH = "../data/Dataset_10191.csv"
@@ -177,6 +179,71 @@ results.append({
 
 np.savez("../models/Custom_LogisticRegression_params.npz", w=custom_model.w, b=custom_model.b)
 
+# Custom SVC
+print("\n" + "=" * 70)
+print("MODEL: Custom_LinearSVC")
+print("=" * 70)
+
+custom_svc = CustomLinearSVC(lr= 1e-6, C=1.0, epochs=100, verbose=True, max_w=10.0)
+custom_svc.fit(X_train_dense, y_train)
+
+y_pred_custom_svc = custom_svc.predict(X_test_dense)
+
+cm = confusion_matrix(y_test, y_pred_custom_svc)
+tn, fp, fn, tp = cm.ravel()
+print("Confusion Matrix:\n", cm)
+print("\nClassification Report:\n", classification_report(y_test, y_pred_custom_svc, target_names=["Safe(0)", "Scam(1)"]))
+
+
+results.append({
+    "model": "Custom_LinearSVC",
+    "accuracy": acc,
+    "precision_scam": precision,
+    "recall_scam": recall,
+    "f1_scam": f1,
+    "tn": cm[0, 0],
+    "fp": cm[0, 1],
+    "fn": cm[1, 0],
+    "tp": cm[1, 1],
+})
+
+# Custom Random Forest 
+
+print("\n" + "=" * 70)
+print("MODEL: Custom_RandomForest")
+print("=" * 70)
+
+custom_rf = CustomRandomForest(
+    n_trees=50,
+    max_depth=20,
+    max_feats="sqrt",
+)
+
+custom_rf.fit(X_train_dense, y_train)
+y_pred_custom_rf = custom_rf.predict(X_test_dense)
+
+cm = confusion_matrix(y_test, y_pred_custom_rf)
+tn, fp, fn, tp = cm.ravel()
+print("Confusion Matrix:\n", cm)
+print("\nClassification Report:\n",
+      classification_report(y_test, y_pred_custom_rf, target_names=["Safe(0)", "Scam(1)"]))
+
+
+results.append({
+    "model": "Custom_RandomForest",
+    "accuracy": acc,
+    "precision_scam": precision,
+    "recall_scam": recall,
+    "f1_scam": f1,
+    "tn": cm[0, 0],
+    "fp": cm[0, 1],
+    "fn": cm[1, 0],
+    "tp": cm[1, 1],
+})
+
+
+
+
 # Save vectorizer 
 
 joblib.dump(vectorizer, "../models/vectorizer.pkl")
@@ -223,6 +290,11 @@ for row in results:
     cm = [[row["tn"], row["fp"]], [row["fn"], row["tp"]]]
     plot_cm(cm, f"Confusion Matrix: {row['model']}",
             f"../results/plots/confusion_{row['model']}.png")
+
+"""for name, cm in cms.items():
+    plot_cm(cm, f"Confusion Matrix: {name}",
+            f"../results/plots/confusion_{name}.png")
+"""
 
 print("Saved confusion matrices in: ../results/plots/")
 print("Saved vectorizer in: ../models/vectorizer.pkl")
