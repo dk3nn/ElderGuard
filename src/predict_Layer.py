@@ -1,16 +1,17 @@
 import joblib
 import numpy as np
+import os 
 
 from preprocess_Layer import clean_text
 from risk_Layer import rule_based_risk_score
 from logRegression import CustomLogisticRegression
 
 
-# Load vectorizer 
-vectorizer = joblib.load("../models/vectorizer.pkl")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Load custom model parameters 
-params = np.load("../models/Custom_LogisticRegression_params.npz")
+vectorizer = joblib.load(os.path.join(BASE_DIR, "../models/vectorizer.pkl"))
+params = np.load(os.path.join(BASE_DIR, "../models/Custom_LogisticRegression_params.npz"))
+
 w = params["w"]
 b = float(params["b"])
 
@@ -29,13 +30,13 @@ def predict(text: str) -> dict:
     # Vectorize 
     vec_sparse = vectorizer.transform([cleaned])
 
-    #Convert to dense for your custom model
+    # Convert to dense for custom model
     vec = vec_sparse.toarray().astype(np.float64)
 
-    # Custom model probability that class=1 (Scam)
+    # Custom model probability 
     ai_prob = float(model.predict_proba(vec)[0][1])
 
-    # Rule-based score 
+    # Rule based score 
     rule_prob, rule_reasons= rule_based_risk_score(text)
 
     # Combine scores
@@ -51,5 +52,5 @@ def predict(text: str) -> dict:
 
 
 if __name__ == "__main__":
-    sample = "Hi im ElderGuard"#"URGENT: verify your account now at http://fake-link.com"
+    sample = "URGENT: verify your account now at http://fake-link.com"
     print(predict(sample))
