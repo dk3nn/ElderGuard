@@ -5,6 +5,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Chat from "./UserChat";
 import Login from "./Login";
 
+
 function App() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -36,6 +37,7 @@ function App() {
                 path="/login" 
                 element={user ? <Navigate to="/" /> : <Login />} 
             />
+            <Route path="/demo" element={<AppDemo />} />
         </Routes>
     );
 }

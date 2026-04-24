@@ -177,6 +177,9 @@ export default function AppDemo() {
   const [isScanning, setIsScanning] = useState(false);
   const [widgetPos, setWidgetPos] = useState({ x: window.innerWidth - 110, y: window.innerHeight - 110 });
   const [dragging, setDragging] = useState(false);
+  const [authPopupOpen, setAuthPopupOpen] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  const isLoggedIn = !!currentUser;
 
   const filteredEmails = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -201,6 +204,15 @@ export default function AppDemo() {
       setIsScanning(false);
     }
   }
+
+  async function handleWidgetClick() {
+  if (!isLoggedIn) {
+    setAuthPopupOpen(true);
+    return;
+  }
+
+  await runScan();
+}
 
   function startDrag(e) {
     setDragging(true);
@@ -321,9 +333,9 @@ export default function AppDemo() {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            runScan();
+            handleWidgetClick();
           }}
-          disabled={!selectedText.trim() || isScanning}
+          disabled={isScanning}
           title={selectedText.trim() ? "Scan highlighted text" : "Highlight text first"}
           className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-xl transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
@@ -402,6 +414,91 @@ export default function AppDemo() {
           </div>
         </div>
       )}
+      {authPopupOpen && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.45)",
+      zIndex: 2000,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <div
+      style={{
+        width: "360px",
+        background: "white",
+        borderRadius: "18px",
+        padding: "24px",
+        boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2 style={{ fontSize: "22px", fontWeight: "700", margin: 0 }}>
+          Sign in required
+        </h2>
+
+        <button
+          onClick={() => setAuthPopupOpen(false)}
+          style={{
+            border: "none",
+            background: "transparent",
+            fontSize: "22px",
+            cursor: "pointer",
+          }}
+        >
+          ×
+        </button>
+      </div>
+
+      <p style={{ marginTop: "12px", color: "#64748b", lineHeight: "1.5" }}>
+        You need to log in or create an account before using the ElderGuard scan widget.
+      </p>
+
+      <div style={{ marginTop: "22px", display: "flex", flexDirection: "column", gap: "12px" }}>
+        <button
+          onClick={() => {
+            setAuthPopupOpen(false);
+            window.location.hash = "#/login";
+          }}
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius: "12px",
+            border: "none",
+            background: "#0f172a",
+            color: "white",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
+        >
+          Log In
+        </button>
+
+        <button
+          onClick={() => {
+            setAuthPopupOpen(false);
+            window.location.hash = "#/login";
+          }}
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius: "12px",
+            border: "1px solid #cbd5e1",
+            background: "white",
+            color: "#0f172a",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
+        >
+          Sign Up
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
