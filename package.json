@@ -12,16 +12,9 @@
     "start": "npm run dev & npm run server"
   },
   "dependencies": {
-<<<<<<< HEAD
+    "@react-oauth/google": "^0.13.5",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
-=======
-    "@react-oauth/google": "^0.13.5",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "pg": "^8.20.0",
->>>>>>> origin/frontend-work
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0"

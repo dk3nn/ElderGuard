@@ -1,21 +1,9 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Chat from "./UserChat";
-<<<<<<< HEAD
-import SignUp from "./SignUp";
 import AppDemo from "./AppDemo";
-
-
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Chat />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/demo" element={<AppDemo />} />
-    </Routes>
-  );
-=======
 import Login from "./Login";
+
 
 function App() {
     const [user, setUser] = useState(null);
@@ -48,9 +36,9 @@ function App() {
                 path="/login" 
                 element={user ? <Navigate to="/" /> : <Login />} 
             />
+            <Route path="/demo" element={<AppDemo />} />
         </Routes>
     );
->>>>>>> origin/frontend-work
 }
 
 export default App;

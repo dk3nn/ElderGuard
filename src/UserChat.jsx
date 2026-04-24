@@ -34,15 +34,7 @@ export default function Chat({ user, onLogout }) {
   const handleSend = async () => {
     if (!input && !image) return;
 
-<<<<<<< HEAD
-  const currentText = input;
-  setInput("");
-  setImage(null);
-=======
-    const userMessage = { sender: "user", text: input, image };
->>>>>>> origin/frontend-work
-
-    setMessages((prev) => [...prev, userMessage]);
+  
 
     const currentText = input;
     setInput("");
