@@ -9,12 +9,12 @@ const USER_AVATAR =
 const BOT_AVATAR =
   "https://img.freepik.com/premium-photo/call-center-portrait-senior-man-with-headset-crm-contact-us-with-communication-professional-headshot-telecom-customer-service-male-consultant-with-help-desk-employee-mic_590464-209087.jpg";
 
-export default function Chat() {
+export default function Chat({ user, onLogout }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [image, setImage] = useState(null);
 
-    useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       setMessages(prev => [
         ...prev,
@@ -30,38 +30,38 @@ export default function Chat() {
 
 
 
-  
- const handleSend = async () => {
-  if (!input && !image) return;
 
-  const userMessage = { sender: "user", text: input, image };
+  const handleSend = async () => {
+    if (!input && !image) return;
 
-  setMessages((prev) => [...prev, userMessage]);
+    const userMessage = { sender: "user", text: input, image };
 
-  const currentText = input;
-  setInput("");
-  setImage(null);
+    setMessages((prev) => [...prev, userMessage]);
 
-  //  temporary loading message
-  setMessages((prev) => [
-    ...prev,
-    { sender: "bot", text: "Analyzing message..." }
-  ]);
+    const currentText = input;
+    setInput("");
+    setImage(null);
 
-  try {
-    const data = await analyzeMessage(currentText);
+    //  temporary loading message
+    setMessages((prev) => [
+      ...prev,
+      { sender: "bot", text: "Analyzing message..." }
+    ]);
 
-    // backend response example:
-    // {
-    //   prediction: "scam",
-    //   confidence: 0.92,
-    //   explanation: "This message contains urgency and payment request."
-    //   simple_explanation: "The message tries to create a sense of urgency and asks for money, which are common signs of scams.",
-    //   scam_type: "Phishing",
-    //   safety_steps: [
-    // }
+    try {
+      const data = await analyzeMessage(currentText);
 
-   const botReply = `
+      // backend response example:
+      // {
+      //   prediction: "scam",
+      //   confidence: 0.92,
+      //   explanation: "This message contains urgency and payment request."
+      //   simple_explanation: "The message tries to create a sense of urgency and asks for money, which are common signs of scams.",
+      //   scam_type: "Phishing",
+      //   safety_steps: [
+      // }
+
+      const botReply = `
  Scam Detection Result
 
 Status: ${data.prediction === "scam" ? " Scam Detected" : " Safe Message"}
@@ -77,18 +77,18 @@ ${data.scam_type}
 ${data.safety_steps.map(step => `• ${step}`).join("\n")}
 `;
 
-    setMessages((prev) => [
-      ...prev.slice(0, -1), // remove "Analyzing..."
-      { sender: "bot", result: data }
-    ]);
+      setMessages((prev) => [
+        ...prev.slice(0, -1), // remove "Analyzing..."
+        { sender: "bot", result: data }
+      ]);
 
-  } catch (error) {
-    setMessages((prev) => [
-      ...prev.slice(0, -1),
-      { sender: "bot", text: "Error connecting to server." }
-    ]);
-  }
-};
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev.slice(0, -1),
+        { sender: "bot", text: "Error connecting to server." }
+      ]);
+    }
+  };
 
 
 
@@ -110,6 +110,22 @@ ${data.safety_steps.map(step => `• ${step}`).join("\n")}
         <div>
           <h1>Need Help?</h1>
           <h4>We'll be happy to assist you.</h4>
+          {user && (
+            <div style={{ fontSize: '14px', marginTop: '5px' }}>
+              <span>Welcome, {user.username || user.email}</span>
+              <button onClick={onLogout} style={{
+                  marginLeft: '10px',
+                  padding: '2px 8px',
+                  background: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px'
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -129,34 +145,34 @@ ${data.safety_steps.map(step => `• ${step}`).join("\n")}
               )}
               {msg.text && <p>{msg.text}</p>}
 
-{msg.result && (
-  <div className="analysis-result">
-    <h3>
-      {msg.result.prediction === "scam"
-        ? " Scam Detected"
-        : " Message Looks Safe"}
-    </h3>
+              {msg.result && (
+                <div className="analysis-result">
+                  <h3>
+                    {msg.result.prediction === "scam"
+                      ? " Scam Detected"
+                      : " Message Looks Safe"}
+                  </h3>
 
-    <p><strong>Confidence:</strong> {(msg.result.confidence * 100).toFixed(1)}%</p>
+                  <p><strong>Confidence:</strong> {(msg.result.confidence * 100).toFixed(1)}%</p>
 
-    <p><strong>What This Means:</strong><br />
-      {msg.result.simple_explanation}
-    </p>
+                  <p><strong>What This Means:</strong><br />
+                    {msg.result.simple_explanation}
+                  </p>
 
-    <p><strong>Scam Type:</strong><br />
-      {msg.result.scam_type}
-    </p>
+                  <p><strong>Scam Type:</strong><br />
+                    {msg.result.scam_type}
+                  </p>
 
-    <div>
-      <strong>Safety Steps:</strong>
-      <ul>
-        {msg.result.safety_steps.map((step, i) => (
-          <li key={i}>{step}</li>
-        ))}
-      </ul>
-    </div>
-  </div>
-)}
+                  <div>
+                    <strong>Safety Steps:</strong>
+                    <ul>
+                      {msg.result.safety_steps.map((step, i) => (
+                        <li key={i}>{step}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}

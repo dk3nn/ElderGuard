@@ -1,0 +1,130 @@
+* {
+    font-family: "Times New Roman", Times, serif;
+}
+
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.loginCard {
+    width: 400px;
+    padding: 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.loginHeader {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.loginHeader h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.input-error {
+    border-color: red;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+    display: block;
+    margin-top: 5px;
+}
+
+.error-message {
+    color: purple;
+    background-color: red;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-top: 10px
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.submit-btn:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 25px 0;
+    text-align: center;
+    color: #999
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    boarder-bottom: 1px solid #ccc;
+}
+
+.divider span {
+    padding: 0 15px;
+    color: #555;
+}
+
+.google-login-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20 px;
+    font-family: 15px;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: #007bff;
+    padding: 0;
+    font-size: 15px;
+}
+
+.toggle-btn:hover {
+    color: #0056b3;
+}
